@@ -1,0 +1,73 @@
+# NetBot Configuration
+# Copy this to config.yaml and fill in your values
+
+bot:
+  token: "YOUR_TELEGRAM_BOT_TOKEN"
+  admin_ids:
+    - 123456789   # Your Telegram user ID
+    - 987654321   # Additional admins
+  webhook_url: ""  # Optional: for webhook mode
+  polling: true    # Set false if using webhook
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  secret_key: "CHANGE_THIS_TO_RANDOM_SECRET"  # Used for agent HMAC auth
+
+redis:
+  host: "redis"
+  port: 6379
+  db: 0
+  password: ""  # Set if Redis has auth
+
+dashboard:
+  enabled: true
+  host: "0.0.0.0"
+  port: 5000
+  title: "NetBot Dashboard"
+
+discovery:
+  enabled: true
+  scan_interval: 300     # Seconds between network scans
+  networks:
+    - "192.168.1.0/24"   # Add your network ranges
+    - "10.0.0.0/24"
+  ping_timeout: 1
+  ping_workers: 50
+
+snmp:
+  enabled: true
+  poll_interval: 60      # Seconds between SNMP polls
+  communities:
+    - "public"
+    - "private"
+  version: "2c"
+  timeout: 5
+  retries: 2
+  port: 161
+
+alerts:
+  enabled: true
+  thresholds:
+    cpu_percent: 90
+    memory_percent: 85
+    disk_percent: 90
+    service_down: true
+  cooldown: 300           # Seconds between repeat alerts for same issue
+
+agents:
+  heartbeat_interval: 30  # Agent heartbeat in seconds
+  offline_threshold: 90   # Mark agent offline after N seconds
+  collect_interval: 60    # How often agents collect metrics
+
+windows:
+  # Default domain (agents can override)
+  domain: "yourdomain.local"
+  # PowerShell remoting timeout
+  ps_timeout: 30
+
+logging:
+  level: "INFO"
+  file: "logs/netbot.log"
+  max_size_mb: 50
+  backup_count: 5
