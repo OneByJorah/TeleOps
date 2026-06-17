@@ -1,4 +1,4 @@
-# 🛡️ J1-NEXUS — Telegram Network Monitoring & Control Agent
+# 🛡️ J1-NOC-Nexus — Telegram Network Monitoring & Control Agent
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python)](https://www.python.org/)
 [![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-26A5E4?logo=telegram)](https://core.telegram.org/bots)
@@ -9,7 +9,7 @@
 
 ## 📋 Overview
 
-**J1-NEXUS** is a powerful, multi-platform Telegram bot that auto-discovers servers and network devices, builds a live dashboard, and lets you control Windows (AD, DNS, DHCP) and Linux servers — all from Telegram. Designed for MSPs and network engineers who want full infrastructure control from their pocket.
+**J1-NOC-Nexus** is a powerful, multi-platform Telegram bot that auto-discovers servers and network devices, builds a live dashboard, and lets you control Windows (AD, DNS, DHCP) and Linux servers — all from Telegram. Designed for MSPs and network engineers who want full infrastructure control from their pocket.
 
 > **Built with ❤️ by [OneByJorah](https://github.com/OneByJorah)**
 
@@ -55,7 +55,7 @@
 ## 📁 Project Structure
 
 ```
-J1-NEXUS/
+J1-NOC-Nexus/
 ├── bot/
 │   ├── main.py              # Bot entry point
 │   ├── handlers.py          # Telegram command handlers
@@ -106,8 +106,8 @@ J1-NEXUS/
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/OneByJorah/J1-NEXUS.git
-cd J1-NEXUS
+git clone https://github.com/OneByJorah/J1-NOC-Nexus.git
+cd J1-NOC-Nexus
 cp config/config.yaml.example config/config.yaml
 # Edit config.yaml with your bot token and admin IDs
 ```
@@ -230,7 +230,7 @@ docker compose pull && docker compose up -d
 ## 🔄 Updates
 
 ```bash
-cd /path/to/J1-NEXUS
+cd /path/to/J1-NOC-Nexus
 git pull origin main
 docker compose up -d --build
 ```
@@ -257,7 +257,7 @@ MIT — use freely, contribute back!
 
 For issues or questions, please open an issue on GitHub:
 
-https://github.com/OneByJorah/J1-NEXUS/issues
+https://github.com/OneByJorah/J1-NOC-Nexus/issues
 
 ---
 
