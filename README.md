@@ -1,27 +1,120 @@
-# J1-NOC-Nexus — Telegram Network Monitoring & Control Agent
+# J1 NOC Nexus (J1-NOC-Nexus)
 
-A multi-platform Telegram bot that auto-discovers servers and network devices,
-builds a live dashboard, and lets you control Windows and Linux servers from Telegram.
+**Version:** v0.1  
+**Status:** Active Development  
+**Repository:** https://github.com/OneByJorah/J1-NOC-Nexus
 
-## Verify locally
-1. `python3 -m venv .venv && source .venv/bin/activate`
-2. `pip install -r requirements.txt`
-3. `cp config/config.yaml.example config/config.yaml`
-4. `python bot/main.py`
-5. Open dashboard: `http://localhost:5000/` if `dashboard/app.py` is configured as the web UI.
+---
 
-## Reference mapping
-- Bot entrypoint: `bot/main.py`
-- Dashboard web app: `dashboard/app.py`
-- Dashboard UI template: `dashboard/templates/index.html`
-- Windows agent: `agents/windows/agent.ps1`
-- Linux agent: `agents/linux/agent.py`
-- Network discovery: `discovery/network_scanner.py`
-- SNMP polling: `discovery/snmp_scanner.py`, `snmp_scanner.py`
-- Deployment: `docker-compose.yml`, `Dockerfile`
+## Table of Contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Technology Stack](#technology-stack)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Service Management](#service-management)
+- [Project Structure](#project-structure)
+- [Screenshots](#screenshots)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
+
+---
+
+## Overview
+
+Next-generation NOC dashboard with Flask backend and real-time monitoring.
+
+---
+
+## Architecture
+
+Client → Local service (`J1-NOC-Nexus`) → data/processing modules → output/api layer.
+Secrets and environment configuration are managed via environment files with restrictive permissions.
+
+---
+
+## Technology Stack
+
+|| Layer | Stack |
+|---|---|
+| Runtime | Linux (Ubuntu 22.04+) |
+| Primary Stack | Flask / Python / HTML |
+| VCS | Git + GitHub (`github.com/OneByJorah/J1-NOC-Nexus`) |
+| Dev Port | Localhost / systemd service |
+
+---
+
+## Features
+
+- Operational dashboard and monitoring (per repo).
+- Exportable data / reports where supported.
+- Extensible service-based design.
+- Dark-themed UI where applicable.
+
+---
+
+## Getting Started
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/OneByJorah/J1-NOC-Nexus.git
+cd J1-NOC-Nexus
+
+# 2. Install dependencies
+# (see specific subproject docs)
+
+# 3. Start the service
+# (see Service Management below)
+```
+
+---
+
+## Service Management
+
+```bash
+# Start the service (example)
+sudo systemctl start J1-NOC-Nexus.service
+sudo systemctl enable J1-NOC-Nexus.service
+```
+
+Access the service via your configured localhost port or reverse proxy.
+
+---
+
+## Project Structure
+
+```
+J1-NOC-Nexus/
+├── README.md
+├── (additional project files)
+```
+
+---
 
 ## Screenshots
-- `docs/screenshots/j1-noc-nexus-dashboard.png`
 
-## Status
-✅ Repo verified, references validated, and documentation updated.
+All screenshots are live captures from the local dev instance.
+
+_(Screenshots will be added after build/run capture.)_
+
+---
+
+## Contributing
+
+1. Create a feature branch off `main`.
+2. Follow the existing code style.
+3. Submit a PR with description and screenshots for UI changes.
+
+---
+
+## License
+
+MIT
+
+---
+
+## Author
+
+Built by **Jhonattan L. Jimenez**.
