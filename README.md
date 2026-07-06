@@ -1,87 +1,77 @@
+<!-- j1-brand:v2 -->
 <div align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white">
-  <img src="https://img.shields.io/badge/Flask-000?style=for-the-badge&logo=flask&logoColor=white">
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white">
-  <img src="https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white">
-</div>
 
-<br>
+# J1-NOC-Nexus
 
-<div align="center">
-  <h1>📡 J1 NOC Nexus</h1>
-  <p><strong>Unified Network Operations Center Platform</strong></p>
-  <p>Telegram bot, SNMP discovery, live dashboard, and cross-platform agents for infrastructure management</p>
-  <p>
-    <a href="#-features">Features</a> •
-    <a href="#-quick-start">Quick Start</a> •
-    <a href="#-architecture">Architecture</a> •
-    <a href="#-components">Components</a>
-  </p>
+A powerful, multi-platform Telegram bot that auto-discovers servers and network devices, builds a live dashboard, and lets you control Windows (AD, DNS, DHCP) and Linux servers — all from Telegram.
+
+[![GitHub](https://img.shields.io/badge/github-OneByJorah%2FJ1--NOC--Nexus-FFB300?style=for-the-badge&labelColor=0d0d0c)](https://github.com/OneByJorah/J1-NOC-Nexus)
+[![License](https://img.shields.io/badge/license-MIT-FFB300?style=for-the-badge&labelColor=0d0d0c)](LICENSE)
+[![Language](https://img.shields.io/badge/Python-FFB300?style=for-the-badge&labelColor=0d0d0c)](https://python.org)
+[![Built by](https://img.shields.io/badge/built%20by-JorahOne%20LLC-FFB300?style=for-the-badge&labelColor=0d0d0c)](https://github.com/OneByJorah)
+
 </div>
 
 ---
 
-## ✨ Features
+## Why This Exists
 
-- **Telegram Bot** — Command execution, notifications, scheduling via Telegram
-- **Flask Dashboard** — Real-time observability dashboard
-- **SNMP Discovery** — Automated network scanning and discovery
-- **Cross-Platform Agents** — Linux and Windows bootstrap scripts
-- **FastAPI Backend** — Modern async API layer
-- **Unified Monitoring** — Centralized view of infrastructure events
+NOC dashboards are great for a big screen in the office, but when you're away from your desk you need the same visibility in your pocket. J1-NOC-Nexus bridges both worlds: a Telegram bot for on-the-go commands and alerts, plus a Flask dashboard for the full view — with SNMP auto-discovery so you don't have to punch in every device by hand.
 
-## 🚀 Quick Start
+## Key Features
+
+| Feature | Why It Matters |
+|---|---|
+| Telegram bot control | Run commands, check status, get alerts — all from your phone |
+| SNMP auto-discovery | Finds devices on your network without manual entry |
+| Flask dashboard | Real-time web UI for the full NOC picture |
+| Cross-platform agents | Bootstrap scripts for both Linux and Windows targets |
+| AD, DNS, DHCP management | Windows domain operations from the same interface |
+| FastAPI backend | Async API layer for integrations and extensibility |
+
+## Quick Start
 
 ```bash
 git clone https://github.com/OneByJorah/J1-NOC-Nexus.git
 cd J1-NOC-Nexus
+
+# Native
 pip install -r requirements.txt
-# Configure your .env file with Telegram bot token
+cp .env.example .env   # configure Telegram bot token, etc.
 python3 handlers.py
+
+# Docker
+docker compose up -d
 ```
 
-Or with Docker:
-```bash
-docker-compose up -d
-```
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-J1-NOC-Nexus/
-├── agents/                    # Platform-specific agents
-│   ├── agent.ps1              # Windows agent
-│   └── install.sh             # Linux agent bootstrap
-├── bot/                       # Telegram bot logic
-├── config/                    # Configuration files
-├── dashboard/                 # Flask dashboard
-├── discovery/                 # SNMP & network discovery
-├── tests/                     # Test suite
-├── docs/                      # Documentation
-├── handlers.py                # Bot command handlers
-├── snmp_scanner.py            # SNMP scanning module
-├── index.html                 # Dashboard frontend
-├── docker-compose.yml         # Docker deployment
-└── requirements.txt
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Telegram     │◀───▶│  Bot Engine   │────▶│  FastAPI      │
+│  (user)       │     │  handlers.py  │     │  API Layer    │
+└──────────────┘     └──────┬───────┘     └──────────────┘
+                            │
+              ┌─────────────┼─────────────┐
+              ▼             ▼             ▼
+       ┌──────────┐  ┌──────────┐  ┌──────────┐
+       │  SNMP     │  │  Flask   │  │  Agents  │
+       │  Scanner  │  │Dashboard │  │  Win/Lin  │
+       └──────────┘  └──────────┘  └──────────┘
 ```
 
-## 🔧 Components
+## Documentation
 
-| Component | Technology | Description |
-|-----------|------------|-------------|
-| Dashboard | Flask/HTML5 | Real-time monitoring UI |
-| Bot | python-telegram-bot | Telegram command interface |
-| Backend | FastAPI | Async API layer |
-| Discovery | Python/SNMP | Network scanning |
-| Agents | PowerShell/Bash | Cross-platform deployment |
-
-## 📄 License
-
-MIT © Jhonattan L. Jimenez
+| Doc | Description |
+|---|---|
+| [Bot Commands](docs/bot.md) | Full Telegram command reference |
+| [Agent Setup](docs/agents.md) | Installing the Windows and Linux agents |
+| [Dashboard Guide](docs/dashboard.md) | Using the Flask web dashboard |
 
 ---
 
-<div align="center">
-  <p>🌐 Your NOC, unified</p>
-  <p><a href="https://github.com/OneByJorah">@OneByJorah</a></p>
-</div>
+## License
+
+MIT © JorahOne, LLC — see [LICENSE](LICENSE)
+
+<sub>Part of the JorahOne infrastructure ecosystem.</sub>
