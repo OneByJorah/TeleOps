@@ -1,4 +1,4 @@
-repo: J1-NOC-Nexus
+repo: TeleOps
 class: Infrastructure
 subclasses: [Monitoring, Dashboard, Python, Docker]
 org: OneByJorah

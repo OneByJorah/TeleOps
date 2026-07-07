@@ -1,4 +1,4 @@
-# INTENT.md — J1-NOC-Nexus (ORACLE Phase)
+# INTENT.md — TeleOps (ORACLE Phase)
 
 > **Phase**: -1 (ORACLE) — Read-only intent reconstruction  
 > **Date**: 2026-07-05  
@@ -9,7 +9,7 @@
 
 ## What This System Does
 
-**J1-NOC-Nexus** (codename "NetBot") is a **unified Network Operations Center (NOC) platform** that combines a Telegram bot, cross-platform infrastructure agents, SNMP discovery, and a live web dashboard into a single deployable system. It is the operational nerve center for the JorahOne infrastructure estate.
+**TeleOps** (formerly J1-NOC-Nexus, codename "NetBot") is a **unified Network Operations Center (NOC) platform** that combines a Telegram bot, cross-platform infrastructure agents, SNMP discovery, and a live web dashboard into a single deployable system. It is the operational nerve center for the JorahOne infrastructure estate.
 
 ### Technical Architecture
 
@@ -89,7 +89,7 @@ The JorahOne NOC team needed a **single pane of glass** that could be operated f
 
 ### How It Fits the JorahOne Ecosystem
 
-J1-NOC-Nexus is the **observability and operations layer** of the JorahOne stack. It complements:
+TeleOps is the **observability and operations layer** of the JorahOne stack. It complements:
 
 - **J1-DevOps** (CI/CD pipeline tooling) by providing the runtime monitoring for deployed infrastructure
 - **J1-Security** (security tooling) by providing alerting and audit trail for infrastructure events
@@ -127,7 +127,7 @@ It is designed as a **self-hosted, zero-license-cost** alternative to commercial
 ## Repository Structure
 
 ```
-J1-NOC-Nexus/
+|TeleOps/
 ├── bot/                    # Telegram bot + agent server
 │   ├── main.py             # Bot entry point, command registration
 │   ├── handlers.py         # All Telegram command handlers
