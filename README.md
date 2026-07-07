@@ -21,6 +21,10 @@
 
 ---
 
+## 📸 Screenshot
+
+This is a CLI/backend-only tool. No screenshots available.
+
 ## ✨ Features
 
 - **Telegram Bot** — Command execution, notifications, scheduling via Telegram
