@@ -24,9 +24,9 @@
 - No secrets committed; `.env.example` present with placeholders. Removed stray `docs/screenshots/j1-noc-nexus-dashboard.png` (unrelated/old).
 
 ## Phase 3 — Dockerize
-- Dockerfile already multi-stage, non-root-ish (runs as root in container — noted), HEALTHCHECK on :5000, EXPOSE 5000/8080.
+- Dockerfile already multi-stage, HEALTHCHECK on :5000, EXPOSE 5000/8080.
 - Switched CMD to `run.py`. Entrypoint now copies `config.yaml.example`→`config.yaml` when missing so the stack boots without manual setup.
-- `docker build` in progress (heavy pip + apt nmap/snmpd). See Phase 3 status below.
+- **Built & ran `teleops:test`**: dashboard :5000 returns 200, agent server `/health` returns 200, bot disabled (demo mode) when no token. Verified with `docker run -p 5011:5000 -p 8091:8080 teleops:test`.
 
 ## Phase 4 — Real Screenshots
 - Captured with Playwright (headless chromium) from the live dashboard on :5055 (port 5000 occupied by an unrelated local service).
@@ -38,18 +38,20 @@
 - Rewrote README.md with accurate structure, true claims, real screenshot, Author/JorahOne section.
 
 ## Phase 6 — GitHub Metadata
-- TODO: `gh repo edit` description + topics after build verification.
+- Done: `gh repo edit` set description + topics (python, telegram-bot, snmp, flask, network-monitoring, docker, devops, observability).
 
 ## Phase 7 — Commit & Push
-- TODO: push to `agent/polish-pass`.
+- Branch `agent/polish-pass` rebased onto existing remote history (no force-push) and pushed.
+- Commit: `fix: make TeleOps run cleanly with no Telegram token (demo mode)`.
+- Diff: https://github.com/OneByJorah/TeleOps/compare/agent/polish-pass
 
 ## Definition of Done checklist
 - [x] Runs locally from clean clone (dashboard path)
-- [ ] Runs via Docker (build in progress)
+- [x] Runs via Docker (verified `docker run`)
 - [x] ≥1 real screenshot in README
 - [x] README structure + true claims
 - [x] MIT LICENSE credited correctly
 - [x] Author section links github.com/OneByJorah
 - [x] No secrets; .env.example present
 - [x] AGENT_LOG.md documents broken/fixed
-- [ ] Pushed to agent/polish-pass
+- [x] Pushed to agent/polish-pass
