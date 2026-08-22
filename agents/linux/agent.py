@@ -252,8 +252,12 @@ def _dispatch(action: str, args: list) -> str:
 
 # ── HMAC Verification ─────────────────────────────────────────────────────────
 
-def verify_signature(token: str, timestamp: str, signature: str, body: str) -> bool:
+def verify_signature(token: str, timestamp: str, signature: str, body: str, max_age: int = 300) -> bool:
     try:
+        # Reject stale timestamps (replay protection)
+        if abs(time.time() - int(timestamp)) > max_age:
+            log.warning("Rejected command: timestamp outside allowed window")
+            return False
         data = f"{timestamp}:{body}".encode()
         expected = hmac.new(token.encode(), data, hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected, signature)

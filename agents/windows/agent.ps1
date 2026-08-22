@@ -341,6 +341,14 @@ function Invoke-SystemCommand {
 
 function Test-Signature {
     param([string]$Timestamp, [string]$Signature, [string]$Body)
+    # Reject stale timestamps (replay protection, +/- 5 min window)
+    $tsUnix = [int64]0
+    if (-not [int64]::TryParse($Timestamp, [ref]$tsUnix)) { return $false }
+    $age = [Math]::Abs([DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - $tsUnix)
+    if ($age -gt 300) {
+        Write-Log "WARN" "Rejected command: timestamp outside allowed window"
+        return $false
+    }
     $secret = $Token
     $data   = "${Timestamp}:${Body}"
     $keyBytes  = [System.Text.Encoding]::UTF8.GetBytes($secret)
@@ -471,16 +479,24 @@ function Register-WithBot {
 Write-Log "INFO" "Starting NetBot Windows Agent v$AgentVersion"
 Write-Log "INFO" "Computer: $env:COMPUTERNAME | Roles: $($InstalledRoles -join ', ')"
 
-# Start heartbeat in background
+# Start heartbeat in background (self-contained job — do NOT re-run this script,
+# that would spawn nested jobs and a second listener)
 $heartbeatJob = Start-Job -ScriptBlock {
-    param($Server, $AgentPath, $Port, $Token)
+    param($Server, $Hostname, $Port)
+    $info = @{
+        agent    = "netbot"
+        hostname = $Hostname
+        ip       = $Hostname
+        url      = "http://${Hostname}:${Port}"
+        os       = "windows"
+    }
     while ($true) {
         Start-Sleep -Seconds 25
         try {
-            # Re-register to update metrics
-            . $AgentPath
+            Invoke-RestMethod -Uri "$Server/agent/register" -Method POST `
+                -Body ($info | ConvertTo-Json) -ContentType "application/json" -TimeoutSec 10 | Out-Null
         } catch {}
     }
-} -ArgumentList $BotServer, $MyInvocation.MyCommand.Path, $ListenPort, $Token
+} -ArgumentList $BotServer, $env:COMPUTERNAME, $ListenPort
 
 Start-HttpListener

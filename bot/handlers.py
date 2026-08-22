@@ -9,6 +9,7 @@ from functools import wraps
 
 from bot.keyboards import (
     agent_list_keyboard,
+    linux_menu_keyboard,
     main_menu_keyboard,
     windows_menu_keyboard,
 )
@@ -35,6 +36,11 @@ def admin_only(func):
 
 def get_agents(ctx) -> dict:
     return ctx.bot_data.get("agents", {})
+
+
+def _safe_code(text, limit: int = 3500) -> str:
+    """Truncate and neutralize Markdown code-fence terminators in agent output."""
+    return str(text)[:limit].replace("```", "`\u200b`\u200b`")
 
 
 # ── /start ────────────────────────────────────────────────────────────────────
@@ -206,7 +212,7 @@ async def _dispatch_windows_command(update, ctx, agent, action, extra_args):
                 data = await resp.json()
 
         result = data.get("result", "No output")
-        text = f"🖥️ *{host}* — `{action}`\n\n```\n{result[:3500]}\n```"
+        text = f"🖥️ *{host}* — `{action}`\n\n```\n{_safe_code(result)}\n```"
         await msg.edit_text(text, parse_mode=ParseMode.MARKDOWN)
 
     except Exception as e:
@@ -245,6 +251,15 @@ async def linux_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def _dispatch_linux_command(update, ctx, agent, action, extra_args):
     host = agent["hostname"]
+
+    if action == "menu":
+        await update.message.reply_text(
+            f"🐧 *{host}* — Linux Menu",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=linux_menu_keyboard(host),
+        )
+        return
+
     msg  = await update.message.reply_text(f"⏳ Querying `{host}`...", parse_mode=ParseMode.MARKDOWN)
 
     try:
@@ -271,7 +286,7 @@ async def _dispatch_linux_command(update, ctx, agent, action, extra_args):
                 data = await resp.json()
 
         result = data.get("result", "No output")
-        text   = f"🐧 *{host}* — `{action}`\n\n```\n{result[:3500]}\n```"
+        text   = f"🐧 *{host}* — `{action}`\n\n```\n{_safe_code(result)}\n```"
         await msg.edit_text(text, parse_mode=ParseMode.MARKDOWN)
 
     except Exception as e:
@@ -351,32 +366,52 @@ async def callback_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     data = query.data
 
-    # Route callbacks by prefix
-    if data.startswith("win:"):
-        _, host, action = data.split(":", 2)
-        agents = get_agents(ctx)
-        agent  = agents.get(host)
-        if agent:
-            # Fake update to reuse handler
-            ctx.args = [host, action]
-            await _dispatch_windows_command(
-                type("obj", (object,), {"message": query.message, "effective_user": query.from_user})(),
-                ctx, agent, action, [],
-            )
+    # Callbacks drive admin actions — verify caller like command handlers do
+    uid = update.effective_user.id
+    admins = ctx.bot_data.get("config", {}).get("bot", {}).get("admin_ids", [])
+    if uid not in admins:
+        log.warning(f"Unauthorized callback attempt by user {uid}")
+        return
 
-    elif data.startswith("lx:"):
+    fake_update = type(
+        "obj", (object,), {"message": query.message, "effective_user": query.from_user}
+    )()
+
+    # Route callbacks by prefix
+    if data.startswith("win:") or data.startswith("lx:"):
         _, host, action = data.split(":", 2)
         agents = get_agents(ctx)
         agent  = agents.get(host)
         if agent:
             ctx.args = [host, action]
-            await _dispatch_linux_command(
-                type("obj", (object,), {"message": query.message, "effective_user": query.from_user})(),
-                ctx, agent, action, [],
-            )
+            if data.startswith("win:"):
+                await _dispatch_windows_command(fake_update, ctx, agent, action, [])
+            else:
+                await _dispatch_linux_command(fake_update, ctx, agent, action, [])
 
     elif data == "status":
-        await status_handler(
-            type("obj", (object,), {"message": query.message, "effective_user": query.from_user})(),
-            ctx,
-        )
+        await status_handler(fake_update, ctx)
+
+    elif data == "agents":
+        await agents_handler(fake_update, ctx)
+
+    elif data == "win_list":
+        ctx.args = []
+        await windows_handler(fake_update, ctx)
+
+    elif data == "lx_list":
+        ctx.args = []
+        await linux_handler(fake_update, ctx)
+
+    elif data == "snmp_list":
+        ctx.args = ["list"]
+        await snmp_handler(fake_update, ctx)
+
+    elif data == "dashboard":
+        await dashboard_handler(fake_update, ctx)
+
+    elif data == "cancel":
+        try:
+            await query.message.edit_text("❌ Cancelled.")
+        except Exception:
+            pass

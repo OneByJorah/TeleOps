@@ -223,6 +223,12 @@ function metricClass(val) {
   return 'ok';
 }
 
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function renderAgents(agents) {
   const el = document.getElementById('agent-list');
   if (!agents || agents.length === 0) {
@@ -235,16 +241,17 @@ function renderAgents(agents) {
     const mem    = parseFloat(a.memory || 0).toFixed(0);
     const disk   = parseFloat(a.disk || 0).toFixed(0);
     const online = a.status === 'online';
-    const roles  = (a.roles || []).map(r => `<span class="role-tag">${r}</span>`).join('');
+    const osCls  = ['windows', 'linux'].includes(a.os) ? a.os : 'unknown';
+    const roles  = (Array.isArray(a.roles) ? a.roles : []).map(r => `<span class="role-tag">${esc(r)}</span>`).join('');
     return `
       <div class="agent-card ${online ? '' : 'offline'}">
-        <div class="status-dot ${a.status || 'offline'}"></div>
+        <div class="status-dot ${esc(a.status || 'offline')}"></div>
         <div class="agent-info">
           <div class="hostname">
-            ${a.hostname || a.ip || 'Unknown'}
-            <span class="os-badge ${a.os || 'unknown'}" style="margin-left:8px">${(a.os||'?').toUpperCase()}</span>
+            ${esc(a.hostname || a.ip || 'Unknown')}
+            <span class="os-badge ${osCls}" style="margin-left:8px">${esc(String(a.os || '?')).toUpperCase()}</span>
           </div>
-          <div class="details">${a.ip || ''} ${a.uptime ? '· up ' + a.uptime : ''}</div>
+          <div class="details">${esc(a.ip || '')} ${a.uptime ? '· up ' + esc(a.uptime) : ''}</div>
           <div class="roles">${roles}</div>
         </div>
         <div class="agent-metrics">
@@ -274,14 +281,14 @@ function renderSNMP(devices) {
   el.innerHTML = devices.map(d => `
     <div class="snmp-card">
       <div>
-        <div class="snmp-ip">${d.ip || 'Unknown'}</div>
-        <div class="snmp-desc">${(d.description || 'Unknown device').substring(0,60)}</div>
-        <div class="snmp-desc">Uptime: ${d.uptime || '?'}</div>
+        <div class="snmp-ip">${esc(d.ip || 'Unknown')}</div>
+        <div class="snmp-desc">${esc(String(d.description || 'Unknown device').substring(0,60))}</div>
+        <div class="snmp-desc">Uptime: ${esc(d.uptime || '?')}</div>
       </div>
       <div class="snmp-stats">
-        ↓ ${d.if_in || '?'}<br>
-        ↑ ${d.if_out || '?'}<br>
-        <span style="color:${d.status==='online'?'var(--green)':'var(--red)'}">${d.status || '?'}</span>
+        ↓ ${esc(d.if_in || '?')}<br>
+        ↑ ${esc(d.if_out || '?')}<br>
+        <span style="color:${d.status==='online'?'var(--green)':'var(--red)'}">${esc(d.status || '?')}</span>
       </div>
     </div>`).join('');
 }
@@ -296,33 +303,45 @@ function updateSummary(agents, snmp) {
 
 let _agents = [], _snmp = [];
 
-socket.on('agents_update', data => {
-  _agents = data.agents || [];
-  renderAgents(_agents);
-  updateSummary(_agents, _snmp);
-});
+// WebSocket updates (optional — dashboard falls back to REST polling)
+try {
+  const socket = io();
 
-socket.on('snmp_update', data => {
-  _snmp = data.devices || [];
-  renderSNMP(_snmp);
-  updateSummary(_agents, _snmp);
-});
+  socket.on('agents_update', data => {
+    _agents = data.agents || [];
+    renderAgents(_agents);
+    updateSummary(_agents, _snmp);
+  });
+
+  socket.on('snmp_update', data => {
+    _snmp = data.devices || [];
+    renderSNMP(_snmp);
+    updateSummary(_agents, _snmp);
+  });
+} catch (e) {
+  console.warn('SocketIO unavailable, using REST polling only:', e);
+}
+
+function refreshFromRest() {
+  fetch('/api/agents').then(r => r.json()).then(d => {
+    _agents = d;
+    renderAgents(_agents);
+    updateSummary(_agents, _snmp);
+  }).catch(() => {});
+  fetch('/api/snmp').then(r => r.json()).then(d => {
+    _snmp = d;
+    renderSNMP(_snmp);
+    updateSummary(_agents, _snmp);
+  }).catch(() => {});
+}
+
+refreshFromRest();
+setInterval(refreshFromRest, 15000);
 
 // Clock
 setInterval(() => {
   document.getElementById('clock').textContent = new Date().toUTCString().slice(0, 25);
 }, 1000);
-
-// Also poll REST for initial load
-fetch('/api/agents').then(r => r.json()).then(renderAgents);
-fetch('/api/snmp').then(r => r.json()).then(renderSNMP);
-fetch('/api/summary').then(r => r.json()).then(s => {
-  document.getElementById('stat-total').textContent   = s.total_agents;
-  document.getElementById('stat-online').textContent  = s.online_agents;
-  document.getElementById('stat-windows').textContent = s.windows_agents;
-  document.getElementById('stat-linux').textContent   = s.linux_agents;
-  document.getElementById('stat-snmp').textContent    = s.snmp_devices;
-});
 </script>
 </body>
 </html>

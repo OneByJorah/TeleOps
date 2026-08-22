@@ -37,9 +37,6 @@ COPY discovery/ discovery/
 COPY agents/ agents/
 COPY tests/ tests/
 COPY docs/ docs/
-COPY handlers.py .
-COPY snmp_scanner.py .
-COPY index.html .
 COPY requirements.txt .
 
 # Create data directories

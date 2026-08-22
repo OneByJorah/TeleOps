@@ -55,7 +55,23 @@ def load_config() -> dict:
         log.error("config/config.yaml not found. Copy config.yaml.example and fill in values.")
         sys.exit(1)
     with open(config_path) as f:
-        return yaml.safe_load(f)
+        cfg = yaml.safe_load(f) or {}
+
+    # Environment overrides (.env loaded by docker-entrypoint.sh)
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    if token:
+        cfg.setdefault("bot", {})["token"] = token
+
+    admins = os.environ.get("ADMIN_CHAT_IDS", "")
+    ids = [int(x.strip()) for x in admins.split(",") if x.strip().lstrip("-").isdigit()]
+    if ids:
+        cfg.setdefault("bot", {})["admin_ids"] = ids
+
+    secret = os.environ.get("SECRET_KEY")
+    if secret:
+        cfg.setdefault("server", {})["secret_key"] = secret
+
+    return cfg
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
@@ -66,13 +82,38 @@ async def post_init(application):
 
     # Start network scanner
     scanner = NetworkScanner(cfg)
+    scanner.set_agent_store(application.bot_data["agents"])
     application.bot_data["scanner"] = scanner
     asyncio.create_task(scanner.start_background_scan())
 
     # Start SNMP scanner
     snmp = SNMPScanner(cfg)
+    snmp.set_device_store(application.bot_data["snmp_devices"])
     application.bot_data["snmp"] = snmp
     asyncio.create_task(snmp.start_background_poll())
+
+    # Agent registration & download server
+    try:
+        from bot.agent_server import start_agent_server
+        await start_agent_server(
+            application.bot_data["agents"], application.bot_data["snmp_devices"], cfg
+        )
+    except Exception as e:
+        log.error(f"Agent server failed to start: {e}")
+
+    # Web dashboard (runs in a background thread)
+    if cfg.get("dashboard", {}).get("enabled", False):
+        try:
+            import threading
+            from dashboard.app import start_dashboard
+            t = threading.Thread(
+                target=start_dashboard,
+                args=(application.bot_data["agents"], application.bot_data["snmp_devices"], cfg),
+                daemon=True,
+            )
+            t.start()
+        except Exception as e:
+            log.error(f"Dashboard failed to start: {e}")
 
     log.info("✅ NetBot ready. All systems go.")
 

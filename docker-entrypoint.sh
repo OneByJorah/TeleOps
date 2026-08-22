@@ -75,5 +75,35 @@ fi
 # Source .env
 export $(grep -v '^#' /app/.env | xargs)
 
+# Seed config/config.yaml from the example using .env values (bot reads YAML, not .env)
+if [ ! -f /app/config/config.yaml ] && [ -f /app/config/config.yaml.example ]; then
+    mkdir -p /app/config
+    python3 - <<'PYEOF'
+import os
+
+import yaml
+
+with open("/app/config/config.yaml.example") as f:
+    cfg = yaml.safe_load(f) or {}
+
+token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+if token and token != "change_me_your_telegram_bot_token":
+    cfg.setdefault("bot", {})["token"] = token
+
+admins = os.environ.get("ADMIN_CHAT_IDS", "")
+ids = [int(x.strip()) for x in admins.split(",") if x.strip().lstrip("-").isdigit()]
+if ids:
+    cfg.setdefault("bot", {})["admin_ids"] = ids
+
+secret = os.environ.get("SECRET_KEY")
+if secret:
+    cfg.setdefault("server", {})["secret_key"] = secret
+
+with open("/app/config/config.yaml", "w") as f:
+    yaml.safe_dump(cfg, f, default_flow_style=False)
+print("Seeded /app/config/config.yaml")
+PYEOF
+fi
+
 echo "Starting J1 NOC Nexus..."
 exec "$@"
