@@ -1,5 +1,5 @@
 # ── Stage 1: Build ──────────────────────────────────────────
-FROM python:3.11-slim AS builder
+FROM python:3.13-slim AS builder
 
 WORKDIR /build
 COPY requirements.txt .
@@ -8,7 +8,7 @@ RUN sed -i '/^python-nmap/d; /^nmap==/d; /^pywinrm/d; /^scapy/d' requirements.tx
     pip install --no-cache-dir --user -r requirements.txt
 
 # ── Stage 2: Runtime ───────────────────────────────────────
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
