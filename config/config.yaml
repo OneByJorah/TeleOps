@@ -1,0 +1,59 @@
+agents:
+  collect_interval: 60
+  heartbeat_interval: 30
+  offline_threshold: 90
+alerts:
+  cooldown: 300
+  enabled: true
+  thresholds:
+    cpu_percent: 90
+    disk_percent: 90
+    memory_percent: 85
+    service_down: true
+bot:
+  admin_ids:
+  - 123456789
+  - 987654321
+  polling: true
+  token: YOUR_TELEGRAM_BOT_TOKEN
+  webhook_url: ''
+dashboard:
+  enabled: true
+  host: 0.0.0.0
+  port: 5000
+  title: NetBot Dashboard
+discovery:
+  enabled: true
+  networks:
+  - 192.168.1.0/24
+  - 10.0.0.0/24
+  ping_timeout: 1
+  ping_workers: 50
+  scan_interval: 300
+logging:
+  backup_count: 5
+  file: logs/netbot.log
+  level: INFO
+  max_size_mb: 50
+redis:
+  db: 0
+  host: redis
+  password: ''
+  port: 6379
+server:
+  host: 0.0.0.0
+  port: 8080
+  secret_key: 95afcf8822b66a164e36b404fa894d5a9030816188f2ece1ba94d38ff1ffe40d
+snmp:
+  communities:
+  - public
+  - private
+  enabled: true
+  poll_interval: 60
+  port: 161
+  retries: 2
+  timeout: 5
+  version: 2c
+windows:
+  domain: yourdomain.local
+  ps_timeout: 30
