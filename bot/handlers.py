@@ -21,6 +21,7 @@ log = logging.getLogger("netbot.handlers")
 
 # ── Auth Decorator ────────────────────────────────────────────────────────────
 
+
 def admin_only(func):
     @wraps(func)
     async def wrapper(update: Update, ctx: ContextTypes.DEFAULT_TYPE, *args, **kwargs):

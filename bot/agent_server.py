@@ -16,7 +16,9 @@ AGENTS_ROOT = Path(__file__).parent.parent / "agents"
 
 def create_agent_server(agents: dict, snmp_devices: dict, config: dict) -> web.Application:
     """Create the aiohttp app for agent communication."""
-    secret = config.get("server", {}).get("secret_key", "")
+    # NOTE: config carries a server.secret_key, but nothing in this module uses it.
+    # It was assigned and never read (flake8 F841). Left as a comment rather than a
+    # silent read so a future implementer sees the intent; remove if unused for good.
 
     app = web.Application()
 

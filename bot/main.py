@@ -20,7 +20,8 @@ from telegram.ext import (
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from bot.handlers import (
+# These must follow the sys.path.insert above, so E402 is expected here.
+from bot.handlers import (  # noqa: E402
     agents_handler,
     alert_handler,
     callback_handler,
@@ -31,9 +32,9 @@ from bot.handlers import (
     status_handler,
     windows_handler,
 )
-from bot.scheduler import setup_scheduler
-from discovery.network_scanner import NetworkScanner
-from discovery.snmp_scanner import SNMPScanner
+from bot.scheduler import setup_scheduler  # noqa: E402
+from discovery.network_scanner import NetworkScanner  # noqa: E402
+from discovery.snmp_scanner import SNMPScanner  # noqa: E402
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 
@@ -48,6 +49,7 @@ logging.basicConfig(
 log = logging.getLogger("netbot.main")
 
 # ── Config ───────────────────────────────────────────────────────────────────
+
 
 def load_config() -> dict:
     config_path = Path("config/config.yaml")
@@ -74,6 +76,7 @@ def load_config() -> dict:
     return cfg
 
 # ── Main ─────────────────────────────────────────────────────────────────────
+
 
 async def post_init(application):
     """Called after bot starts — boot background tasks."""

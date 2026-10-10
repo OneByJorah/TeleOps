@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Lint
-        run: flake8 bot/ discovery/ dashboard/ --max-line-length=120 --ignore=E501,W503
+        run: flake8 bot/ discovery/ dashboard/
 
       - name: Test
         run: pytest tests/ -v --tb=short

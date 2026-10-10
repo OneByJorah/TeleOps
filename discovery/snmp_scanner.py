@@ -184,7 +184,7 @@ class SNMPScanner:
             if_in = await get_oid(f"{OID_IF_IN}.1")
             if_out = await get_oid(f"{OID_IF_OUT}.1")
 
-            if_in_str  = _bytes_to_human(int(if_in))  if if_in  else "N/A"
+            if_in_str  = _bytes_to_human(int(if_in)) if if_in else "N/A"
             if_out_str = _bytes_to_human(int(if_out)) if if_out else "N/A"
 
             # CPU load (UCD-SNMP or HOST-MIB)
@@ -206,7 +206,7 @@ class SNMPScanner:
                     pass
 
             return {
-                "name":        str(name)        if name        else ip,
+                "name":        str(name) if name else ip,
                 "description": str(description) if description else "Unknown",
                 "uptime":      uptime_str,
                 "if_in":       if_in_str,
