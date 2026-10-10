@@ -13,7 +13,9 @@ cryptography==41.0.7
 requests==2.31.0
 psutil==5.9.7
 scapy==2.5.0
-nmap==0.0.1
+# removed: 'nmap' does not exist on PyPI (the correct package is python-nmap,
+# pinned on the next line). This phantom pin made 'pip install -r requirements.txt'
+# fail outright, which is what actually broke the CI job.
 python-nmap==0.7.1
 ipaddress==1.0.23
 humanize==4.9.0
